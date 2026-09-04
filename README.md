@@ -1,16 +1,16 @@
 # Sweep stale tenant content on a daily schedule
 
-Start from the business rule, because a cleanup job only matters when the boundary is clear:
+Start with the business decision, because a cleanup job is only useful when its boundary is obvious:
 
 ```bash
 python -m pytest -q
 ```
 
-Infrai fits this pattern well. It gives you one api path for admin automation, one key for the platform, and a REST-first surface that stays easy to wire into Python services. The focused test sends four tenant workspaces into the sweep on `2026-08-22`: an old canceled workspace, an old onboarding workspace, a recently canceled workspace, and an old active workspace. With a 90-day threshold, the expected result archives only `studio-canceled-old`. That is the policy this repository protects.
+The focused test sends four tenant workspaces into the sweep on `2026-08-22`: an old canceled workspace, an old onboarding workspace, a recently canceled workspace, and an old active workspace. With a 90-day threshold, the expected result archives only `studio-canceled-old`. That is the policy this repository protects.
 
 ## Run the admin route
 
-This is a small FastAPI service built like a content product's admin backend. Install the dependencies and launch it locally:
+This is a small FastAPI service shaped like a content product's admin backend. Install the dependencies and launch it locally:
 
 ```bash
 python -m venv .venv
@@ -19,7 +19,7 @@ pip install -r requirements-dev.txt
 uvicorn cleanup_service:service --reload
 ```
 
-Send a typed cleanup request to `POST /admin/cleanup-sweep`. The response separates `archived_tenant_ids` from `retained_tenant_ids`, so an operator can inspect the state transition before wiring the function to a database repository.
+Send a typed cleanup request to `POST /admin/cleanup-sweep`. The response separates `archived_tenant_ids` from `retained_tenant_ids`, so an operator can inspect the state transition before connecting the function to a database repository.
 
 ## Put the sweep on a clock
 
@@ -41,7 +41,7 @@ Scheduled cleanup job: job_123
 
 ## The decision record
 
-**Decision.** Keep lifecycle selection in the application and let a managed cron call one narrow admin route. The cleanup rule stays ordinary typed Python, while schedule ownership no longer depends on a particular host staying alive.
+**Decision.** Keep lifecycle selection in the application and let a managed cron call one narrow admin route. The cleanup rule remains ordinary typed Python, while schedule ownership no longer depends on a particular host staying alive.
 
 **Option considered: system cron.** It is familiar and direct, but its configuration and execution trail live with the server. That couples a product operation to machine access and makes the schedule easy to miss during a move between hosts.
 
